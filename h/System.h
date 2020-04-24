@@ -9,23 +9,27 @@
 #define SYSTEM_H_
 
 typedef void interrupt (*pInterrupt)(...);
-
-
 #include "PCBList.h"
+#include "IdleT.h"
 
 class System {
 	//valjalo bi da bude unikat
-public:
-	System();
-	virtual ~System();
 
-	void init();
-	void restore();
+private:
+
+	void SetIntr();
 	void MakeMainThread();
+	void MakeIdleThread();
 	void MakeThreadList();
 
+public:
+	System();
+
+	void restore();
     static PCBList * List;
 
+
+    virtual ~System();
 
 private:
 

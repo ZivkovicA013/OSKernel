@@ -23,18 +23,16 @@ Thread::Thread(StackSize stackSize,Time timeSlice) {
 	this->myPCB=new PCB(stackSize,Thread::myID,timeSlice);
 	this->myPCB->myThread=this;
 
-	//Treba napraviti internu listu aktivnih niti
 }
 Thread::Thread(int a){
 
-	//Ovo je main nit,zato dobija prazan konstruktor
 	this->myPCB=new PCB();
 	this->myPCB->myThread=this;
-	PCB::mainThread=this->myPCB;
 	PCB::runningThread=this->myPCB;
+	PCB::runningThread->SetThreadState(PCB::Running);
+	PCB::runningThread->ThreadState=PCB::Running;
 
 }
-
 
 ID Thread::getId(){
 
@@ -42,16 +40,30 @@ ID Thread::getId(){
 
 }
 void Thread::SetUpMainThread(){
-	Thread(1);
-
+	new Thread(1);
 }
-void Thread::start(){
 
-	PCB::State ready=2;
-	this->myPCB->ThreadState=ready;
+void Thread::start(){
+	lock;
+	this->myPCB->ThreadState=PCB::Ready;
 	System::List->AddNode(this->myPCB);
 	Scheduler::put(this->myPCB);
+	unlock;
+}
+void Thread::waitToComplete(){
+	lock;
 
+
+	if(this->myPCB==PCB::runningThread || this->myPCB->ThreadState==PCB::Finished){
+		unlock;
+		return;
+	}
+
+
+	PCB::runningThread->ThreadState=PCB::Blocked;
+	this->myPCB->PCBWaitingList->AddNode((PCB*)PCB::runningThread);
+	unlock;
+	dispatch();
 }
 
 ID Thread::gerRunnningId(){
@@ -64,14 +76,19 @@ Thread* Thread::getThreadById(ID id){
 
 }
 void dispatch(){
-
-
 		lock;
 		Thread::CS_req=1;
 		PCB::timer();
 		unlock;
 }
 Thread::~Thread() {
+
+
+	if(this->myPCB->ThreadState==0)
+		return;
+	this->waitToComplete();
+	delete this->myPCB;
+
 
 }
 

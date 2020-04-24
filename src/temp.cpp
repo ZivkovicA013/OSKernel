@@ -1,93 +1,75 @@
-/*
- * temp.cpp
- *
- *  Created on: Apr 8, 2020
- *      Author: OS1
- */
 #include "System.h"
 #include "PCB.h"
 #include "Thread.h"
 #include "UThreadA.h"
 #include "UThreadB.h"
 #include <stdio.h>
-#include <dos.h>
 
-#define lock asm cli
-#define unlock asm sti
+
+class TestThread : public Thread
+{
+private:
+	TestThread *t;
+
+public:
+
+	TestThread(TestThread *thread): Thread(), t(thread){}
+	~TestThread()
+	{
+		this->waitToComplete();
+	}
+protected:
+
+	void run();
+
+};
+
+void TestThread::run()
+{
+	t->waitToComplete();
+}
+
 
 
 int main(){
 
-
+	System* sistem=new System();
 	lock;
-
-	System* sys=new System();
-
-	sys->init();
-	sys->MakeMainThread();
-	sys->MakeThreadList();
-
-
-	//USER MAIN
-	UThreadA * a  = new UThreadA(4096,2);
-	UThreadB * b = new UThreadB(4096,1);
-	UThreadA * c = new UThreadA(4096,1);
-	UThreadB * d = new UThreadB(4096,2);
-	UThreadA * e = new UThreadA(4096,2);
-	UThreadB * f = new UThreadB(4096,1);
-	UThreadA * g = new UThreadA(4096,1);
-	UThreadB * h = new UThreadB(4096,2);
-	UThreadA * aa  = new UThreadA(4096,2);
-	UThreadB * bb = new UThreadB(4096,1);
-	UThreadA * cc= new UThreadA(4096,1);
-	UThreadB * dd = new UThreadB(4096,2);
-	UThreadA * ee = new UThreadA(4096,2);
-	UThreadB * ff = new UThreadB(4096,1);
-	UThreadA * gg = new UThreadA(4096,1);
-	UThreadB * hh = new UThreadB(4096,2);
-
-
-
-	a->start();
-	b->start();
-	c->start();
-	d->start();
-	e->start();
-	f->start();
-	g->start();
-	h->start();
-	aa->start();
-	bb->start();
-	cc->start();
-	dd->start();
-	ee->start();
-	ff->start();
-	gg->start();
-	hh->start();
-
-
-
+	printf("USER MAIN STARTS \n");
 	unlock;
+	//USER MAIN/////////////////////////////////////////////////
 
 	int i,j,k;
+	TestThread *t1,*t2;
+	t1 = new TestThread(t2);
+	t2 = new TestThread(t1);
+	t1->start();
+	t2->start();
+
+	delete t1;
+	delete t2;
+
+	//END USER MAIN////////////////////////////////////////////
+
+	lock;
+	printf("USER MAIN ENDS! \n");
+	unlock;
 
 
-		for ( i = 0; i < 30; ++i) {
-			 lock;
-			 printf("U main sam \n");
-			 unlock;
-
-			for (j = 0; j< 30000; ++j)
-				for ( k = 0; k < 30000; ++k);
-		}
-		printf("Kraj \n");
+	for ( i = 0; i <20; i++) {
+		lock;
+		printf("U main sam \n");
+		unlock;
+		for (j = 0; j< 10000; ++j)
+			for ( k = 0; k < 30000; ++k);
+	}
 
 
 
-	//USER MAIN
+	lock
+	printf("System END! \n");
+	unlock
 
+	sistem->restore();
 
-
-
-	sys->restore();
 }

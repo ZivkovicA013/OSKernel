@@ -20,19 +20,19 @@
 
 UThreadB::UThreadB(StackSize stackSize,Time timeSlice):Thread(stackSize,timeSlice) {
 	// TODO Auto-generated constructor stub
-	printf("Napravljena nit B \n");
 
 }
 
 UThreadB::~UThreadB() {
-	// TODO Auto-generated destructor stub
+	//this->waitToComplete();
 }
 
 void UThreadB::run(){
 
 	int i,j,k;
 
-	for (i =0; i < 25; i++) {
+
+	for (i =0; i < 10; i++) {
 			lock;
 			printf("u B %d ID niti je %d \n",i,this->getId());
 			unlock;
@@ -40,9 +40,5 @@ void UThreadB::run(){
 						for (j = 0; j <30000; ++j);
 
 		}
-
-
-
-
 
 }

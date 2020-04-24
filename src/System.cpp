@@ -5,10 +5,10 @@
  *      Author: OS1
  */
 
-
+#include <stdio.h>
 #include <dos.h>
 #include "System.h"
-#include <stdio.h>
+
 
 
 #define lock asm cli
@@ -24,21 +24,27 @@
 PCBList* System::List=0;
 
 
+
 System::System() {
 	// TODO Auto-generated constructor stub
 	this->oldTimmerIntr=0;
+
+	this->SetIntr();
+	this->MakeMainThread();
+	this->MakeThreadList();
+	this->MakeIdleThread();
 
 }
 
 System::~System() {
 	// TODO Auto-generated destructor stub
+	lock
+	delete this->List;
+	unlock
 }
 
+void System::SetIntr(){
 
-void System::init(){
-
-
-//postavlja novu prekidnu rutinu
 	lock;
 
 	#ifndef BCC_BLOCK_IGNORE
@@ -47,19 +53,18 @@ void System::init(){
 		setvect(0x60,oldTimmerIntr);
 	#endif
 
-	unlock;
-
+		unlock;
 }
 
 void System::restore(){
 //vraca staru tajmer prekidnu rutinu u predjasnje stanje
+
 	lock
 #ifndef BCC_BLOCK_IGNORE
 	setvect(0x08,oldTimmerIntr);
 #endif
 	unlock
 }
-
 
 void System::MakeThreadList(){
 
@@ -69,9 +74,12 @@ void System::MakeThreadList(){
 
 void System::MakeMainThread(){
 
-
 	Thread::SetUpMainThread();
-	printf("Postavljen main PCB \n");
 }
 
+void System::MakeIdleThread(){
+
+	new IdleT(4096,1);
+
+}
 

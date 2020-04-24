@@ -11,6 +11,9 @@
 #include "Thread.h"
 
 class UThreadB:public Thread{
+private:
+
+
 public:
 	UThreadB(StackSize stackSize=defaultStackSize,Time timeSlice=defaultTimeSlice);
 	virtual ~UThreadB();

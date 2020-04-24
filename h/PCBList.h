@@ -8,14 +8,26 @@
 #ifndef PCBLIST_H_
 #define PCBLIST_H_
 
-#include "PNode.h"
+#include "PCB.h"
 
 
 class PCBList {
 
 private:
-	PNode* ListHead;
-	PNode* ListTail;
+
+	struct PCBNode{
+
+		PCB* myPCB;
+		PCBNode* next;
+		int deleted;//1 da 0 ne
+
+		PCBNode(PCB* pcb,PCBNode* n=0):myPCB(pcb),next(n),deleted(0){}
+
+		~PCBNode(){delete this->myPCB;}
+	};
+
+	PCBNode* ListHead;
+	PCBNode* ListTail;
 
 public:
 
@@ -23,11 +35,16 @@ public:
 
 	void AddNode(PCB * pcb);
 	void PrintAll();
-	int  AllFinished();//1->yes 0->no
+	void DeleteCurrent();
 	void RemoveByID(int id);
-	PCB* GetByID(int id);//PCB return method
-	~PCBList();
 
+	int  AllFinished();//1->yes 0->no
+	int IsEmpty();//1->yes,0->no
+
+	PCB* GetByID(int id);//PCB return method
+	PCBNode* GetHead();
+
+	~PCBList();
 
 };
 

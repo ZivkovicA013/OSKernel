@@ -31,23 +31,27 @@ public:
 	static ID gerRunnningId();
 	static Thread * getThreadById(ID id);
 	static void SetUpMainThread();
+	static void SetUpIdleThread();
 	static volatile int CS_req;
 
 
 
+
+
 	Thread(StackSize stackSize=defaultStackSize,Time timeSlice=defaultTimeSlice);
+	//treba da bude protected
 
 protected:
 
 	friend class PCB;
-
-	//konstruktor mora ovde
-	virtual void run(){}//logika izvrsavanja niti
+	virtual void run(){}
+	PCB* myPCB;
 
 private:
 
 	Thread(int a);
-	PCB* myPCB;
+	Thread(char a);
+
 	static ID myID;
 
 };

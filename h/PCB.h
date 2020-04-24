@@ -18,6 +18,9 @@ typedef unsigned int Time;
 
 #define unlock asm sti
 
+class PCBList;
+
+
 class PCB {
 public:
 
@@ -27,36 +30,37 @@ public:
 	PCB();
 	virtual ~PCB();
 
-	static volatile PCB* runningThread;
-	static PCB* mainThread;
-
-	friend class Thread;
+	static  PCB* runningThread;
+	static void ReleaseAllPCB();
 	static void interrupt timer(...);
+	static PCB* mainThread;
+	static PCB* idleThread;
+
 	ID GetThreadID();
 	State GetThreadState();
+	void SetThreadState(State s);
 
+	State ThreadState;
 
+	friend class Thread;
 
 private:
 
-
-	ID ThreadID;
-	Thread * myThread;
+	int TimeSlice;
 	unsigned * myStack;
 	unsigned Stack_OFF;
 	unsigned Stack_SEG;
 	unsigned BasePointer;
 	unsigned long Stack_Size;
 
-	int TimeSlice;
-	//ID ThreadID;
-	State ThreadState;
 
 
+	ID ThreadID;
+	Thread * myThread;
+
+	PCBList* PCBWaitingList;
 
 	static void WrapperFunction();
-
-
 
 
 };
