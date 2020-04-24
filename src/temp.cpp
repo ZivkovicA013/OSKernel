@@ -5,6 +5,7 @@
 #include "UThreadB.h"
 #include <stdio.h>
 
+//Cpp fajl za testiranje projekta.
 
 class TestThread : public Thread
 {
