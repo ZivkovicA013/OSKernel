@@ -3,21 +3,28 @@
 #include "Thread.h"
 #include "UThreadA.h"
 #include "UThreadB.h"
-#include <stdio.h>
+#include "Semap.h"
+#include "KerSem.h"
 
-//Cpp fajl za testiranje projekta.
+#include<stdio.h>
+#include<stdlib.h>
+
+
+int t=-1;
+const int n=15;
+Semaphore s(1);
 
 class TestThread : public Thread
 {
 private:
-	TestThread *t;
+	Time waitTime;
 
 public:
 
-	TestThread(TestThread *thread): Thread(), t(thread){}
+	TestThread(Time WT): Thread(), waitTime(WT){}
 	~TestThread()
 	{
-		this->waitToComplete();
+		waitToComplete();
 	}
 protected:
 
@@ -27,50 +34,56 @@ protected:
 
 void TestThread::run()
 {
-	t->waitToComplete();
+	asm cli;
+	printf("Thread %d waits for %d units of time...\n",PCB::runningThread->GetThreadID(),waitTime);
+	asm sti;
+	int r = s.wait(waitTime);
+	if(getId()%2)
+		s.signal();
+	asm cli;
+	printf("Thread %d finished: r=%d \n",PCB::runningThread->GetThreadID(),r);
+	asm sti;
 }
 
+Semaphore* mutex = 0;
 
 
-int main(){
 
-	System* sistem=new System();
-	lock;
-	printf("USER MAIN STARTS \n");
-	unlock;
-	//USER MAIN/////////////////////////////////////////////////
-
-	int i,j,k;
-	TestThread *t1,*t2;
-	t1 = new TestThread(t2);
-	t2 = new TestThread(t1);
-	t1->start();
-	t2->start();
-
-	delete t1;
-	delete t2;
-
-	//END USER MAIN////////////////////////////////////////////
-
-	lock;
-	printf("USER MAIN ENDS! \n");
-	unlock;
-
-
-	for ( i = 0; i <20; i++) {
-		lock;
-		printf("U main sam \n");
-		unlock;
-		for (j = 0; j< 10000; ++j)
-			for ( k = 0; k < 30000; ++k);
+void tick()
+{
+	t++;
+	if(t){
+		asm cli;
+		printf("%d\n",t);
+		asm sti;
 	}
+}
 
 
+int userMain(int argc, char** argv)
+{
+	lock;
+	printf("Test starts.\n");
+	unlock;
 
-	lock
-	printf("System END! \n");
-	unlock
+	TestThread* t[n];
+	int i;
+	for(i=0;i<n;i++)
+	{
+		t[i] = new TestThread(5*(i+1));
+		t[i]->start();
+	}
+	for(i=0;i<n;i++)
+	{
+			t[i]->waitToComplete();
+	}
+	delete t;
+	printf("Test ends.\n");
+	unlock;
 
-	sistem->restore();
+	return 0;
 
 }
+
+
+

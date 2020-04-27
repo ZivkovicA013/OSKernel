@@ -30,6 +30,7 @@ PCB::PCB(unsigned long size,ID id,Time time) {
    this->Stack_Size=size;
    this->ThreadState=New;
    this->PCBWaitingList=new PCBList();
+   this->TimeToWait=0;
 
    this->myStack=new unsigned[size];
 
@@ -58,6 +59,7 @@ PCB::PCB(){
 	this->TimeSlice=1;
 	this->ThreadID=0;
 	this->myThread=0;
+	this->TimeToWait=0;
 	this->PCBWaitingList=new PCBList();
 	this->ThreadState=PCB::Running;
 }
@@ -72,6 +74,14 @@ PCB::State PCB::GetThreadState(){
 
 	return this->ThreadState;
 }
+
+int PCB::GetTimeToWait(){
+	return this->TimeToWait;
+}
+void PCB::SetTimeToWait(int newT){
+	this->TimeToWait=newT;
+}
+
 
 PCB::~PCB() {
 
@@ -90,17 +100,14 @@ void PCB::ReleaseAllPCB(){
 		if(PCB::runningThread->PCBWaitingList->IsEmpty()==1)
 			return;
 
-
 		PCBList::PCBNode * temp=PCB::runningThread->PCBWaitingList->GetHead();
-
 
 		while(temp!=0){
 
-			if(temp->deleted==0){
-				temp->myPCB->SetThreadState(PCB::Ready);
-				Scheduler::put(temp->myPCB);
-				PCB::runningThread->PCBWaitingList->RemoveByID(temp->myPCB->GetThreadID());
-			}
+			temp->myPCB->SetThreadState(PCB::Ready);
+			Scheduler::put(temp->myPCB);
+			PCB::runningThread->PCBWaitingList->RemoveByID(temp->myPCB->GetThreadID());
+
 			temp=temp->next;
 		}
 
@@ -127,7 +134,7 @@ volatile int tbp;
 volatile int cntr=1;//toliko ce main da ceka
 
 
- void tick(){}
+extern void tick();
 
 void interrupt PCB::timer(...){
 
@@ -136,6 +143,33 @@ void interrupt PCB::timer(...){
 			cntr--;
 			tick();
 	}
+
+
+	//KOD ZA TICM TIMERA KOD SEMAFORA
+
+
+	SEMList::SEMNode* temp_s=System::Sem_List->GetHead();
+	while(temp_s!=0){
+
+		PCBList::PCBNode* temp_t=temp_s->mySEM->GetMyImpl()->GetTimeBlocked()->GetHead();
+		while(temp_t!=0){
+			if(temp_t->myPCB->GetTimeToWait()>0){
+				int new_time=temp_t->myPCB->GetTimeToWait();
+				new_time--;
+				temp_t->myPCB->SetTimeToWait(new_time);
+				if(new_time==0){
+					temp_t->myPCB->SetThreadState(PCB::Ready);
+					Scheduler::put(temp_t->myPCB);
+					temp_s->mySEM->GetMyImpl()->GetTimeBlocked()->RemoveByID(temp_t->myPCB->GetThreadID());
+				}
+			}
+			temp_t=temp_t->next;
+		}
+		temp_s=temp_s->next;
+	}
+
+	//KOD ZA TICK TIMERA KOD SEMAFORA
+
 
 	if((cntr==0) || (Thread::CS_req==1)){
 

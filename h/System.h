@@ -11,6 +11,7 @@
 typedef void interrupt (*pInterrupt)(...);
 #include "PCBList.h"
 #include "IdleT.h"
+#include "SEMList.h"
 
 class System {
 	//valjalo bi da bude unikat
@@ -21,12 +22,14 @@ private:
 	void MakeMainThread();
 	void MakeIdleThread();
 	void MakeThreadList();
+	void MakeSemaphoreList();
 
 public:
 	System();
 
 	void restore();
     static PCBList * List;
+    static SEMList * Sem_List;
 
 
     virtual ~System();

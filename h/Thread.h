@@ -28,7 +28,7 @@ public:
 	virtual ~Thread();
 
 	ID getId();//Dohvata id niti
-	static ID gerRunnningId();
+	static ID getRunnningId();
 	static Thread * getThreadById(ID id);
 	static void SetUpMainThread();
 	static void SetUpIdleThread();

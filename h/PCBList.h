@@ -19,15 +19,16 @@ private:
 
 		PCB* myPCB;
 		PCBNode* next;
-		int deleted;//1 da 0 ne
+		//int deleted;//1 da 0 ne
 
-		PCBNode(PCB* pcb,PCBNode* n=0):myPCB(pcb),next(n),deleted(0){}
+		PCBNode(PCB* pcb,PCBNode* n=0):myPCB(pcb),next(n){}
 
-		~PCBNode(){delete this->myPCB;}
+		~PCBNode(){ this->myPCB=0;}
 	};
 
 	PCBNode* ListHead;
 	PCBNode* ListTail;
+	int element_cnt;
 
 public:
 
@@ -37,6 +38,8 @@ public:
 	void PrintAll();
 	void DeleteCurrent();
 	void RemoveByID(int id);
+	void MoveHeadNext();
+	int GetItemCnt();
 
 	int  AllFinished();//1->yes 0->no
 	int IsEmpty();//1->yes,0->no

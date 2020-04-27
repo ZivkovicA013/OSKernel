@@ -66,7 +66,7 @@ void Thread::waitToComplete(){
 	dispatch();
 }
 
-ID Thread::gerRunnningId(){
+ID Thread::getRunnningId(){
 	return PCB::mainThread->GetThreadID();
 
 }
@@ -84,13 +84,11 @@ void dispatch(){
 Thread::~Thread() {
 
 
-	if(this->myPCB->ThreadState==0)
+	if(this->myPCB->ThreadState==0 || this->myPCB->ThreadID==1)
 		return;
 	this->waitToComplete();
 	delete this->myPCB;
 
-
 }
-
 
 

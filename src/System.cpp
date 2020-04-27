@@ -22,7 +22,7 @@
 //Liste PCB,Niti
 
 PCBList* System::List=0;
-
+SEMList* System::Sem_List=new SEMList();
 
 
 System::System() {
@@ -64,6 +64,11 @@ void System::restore(){
 	setvect(0x08,oldTimmerIntr);
 #endif
 	unlock
+}
+
+void System::MakeSemaphoreList(){
+
+	System::Sem_List=new SEMList();
 }
 
 void System::MakeThreadList(){

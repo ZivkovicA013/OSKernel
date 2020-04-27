@@ -42,6 +42,9 @@ public:
 
 	State ThreadState;
 
+	int GetTimeToWait();
+	void SetTimeToWait(int newT);
+
 	friend class Thread;
 
 private:
@@ -54,6 +57,7 @@ private:
 	unsigned long Stack_Size;
 
 
+	int TimeToWait;//Semaforsko vreme
 
 	ID ThreadID;
 	Thread * myThread;

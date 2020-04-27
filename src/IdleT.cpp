@@ -24,7 +24,7 @@ void IdleT::run(){
 
 		while(1) {
 				lock;
-				printf("IDLE \n");
+				//printf("IDLE \n");
 				unlock;
 				for ( k = 0; k<10000; ++k)
 							for (j = 0; j <30000; ++j);
