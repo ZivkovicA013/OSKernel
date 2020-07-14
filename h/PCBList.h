@@ -19,11 +19,12 @@ private:
 
 		PCB* myPCB;
 		PCBNode* next;
-		//int deleted;//1 da 0 ne
+		int deleted;//1 da 0 ne
 
-		PCBNode(PCB* pcb,PCBNode* n=0):myPCB(pcb),next(n){}
+		PCBNode(PCB* pcb,PCBNode* n=0):myPCB(pcb),next(n),deleted(0){}
 
-		~PCBNode(){ this->myPCB=0;}
+		~PCBNode(){}
+
 	};
 
 	PCBNode* ListHead;

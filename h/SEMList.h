@@ -21,7 +21,6 @@ private:
 		SEMNode(Semaphore* s):mySEM(s),next(0),deleted(0){};
 
 		~SEMNode(){
-			delete mySEM;
 		}
 
 	};

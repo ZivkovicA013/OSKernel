@@ -40,15 +40,20 @@ public:
 	State GetThreadState();
 	void SetThreadState(State s);
 
+
 	State ThreadState;
 
 	int GetTimeToWait();
 	void SetTimeToWait(int newT);
 
+	void SetTimeUnBlocked(int x);
+	int  IsTimeUnBlocked();
 	friend class Thread;
 
 private:
 
+
+	int timeUnBlocked;//1->yes 0->no
 	int TimeSlice;
 	unsigned * myStack;
 	unsigned Stack_OFF;
